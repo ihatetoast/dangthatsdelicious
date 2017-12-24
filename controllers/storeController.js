@@ -1,4 +1,10 @@
+//for mongodb
+const mongoose = require('mongoose');
 
+//need access to the models (store). that's already required in the start.js file, so ...
+//we just references it (b/c of the singleton: require once, reference several times)
+//store because module.exports = mongoose.model('Store', storeSchema); i defined it there at bottom of store.js
+const Store = mongoose.model('Store');
 // handles when anyone requests the homepage
 exports.homePage = (req, res) => {
   console.log(req.name);
@@ -14,6 +20,11 @@ exports.addStore = (req, res)=> {
   res.render('editStore', {title: 'Add Store'})
 
 }
-exports.createStore = (req, res) => {
-  res.json(req.body);
+//store created here in ES8's async await
+exports.createStore = async (req, res) => {
+  const store = new Store(req.body);
+  //then fire off a connection to the mongodb database with .save();
+  await store.save();
+  res.redirect('/');
 }
+//^did not wrap in a try/catch because we are wrapping createStore in a fcn that catches errors
