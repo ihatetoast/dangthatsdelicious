@@ -1,0 +1,11 @@
+extends layout
+
+include mixins/_storeForm
+
+block content
+  .inner
+    h2 #{title}
+    //- use form in a sep file (use a mixin)
+
+    //- we are using the mixin:
+    +storeForm()
