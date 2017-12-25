@@ -7,10 +7,14 @@ const { catchErrors } =require('../handlers/errorHandlers');
 // obj destructuring allows us to import an entire object. imports one method we need
 
 // Do work here
-router.get('/', storeController.homePage);
+router.get('/', catchErrors(storeController.getStores));
+router.get('/stores', catchErrors(storeController.getStores));
+router.get('/stores/:id/edit', catchErrors(storeController.editStore))
+
 //myMiddleware calls next(); so it passes to the next fcn
 router.get('/add', storeController.addStore);
 //for when we post a form we need to post from add
 router.post('/add', catchErrors(storeController.createStore));
+router.post('/add/:id', catchErrors(storeController.updateStore));
 
 module.exports = router;

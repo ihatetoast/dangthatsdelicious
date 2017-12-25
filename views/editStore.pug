@@ -4,8 +4,9 @@ include mixins/_storeForm
 
 block content
   .inner
+    //- pre= h.dump(store)
     h2 #{title}
     //- use form in a sep file (use a mixin)
 
     //- we are using the mixin:
-    +storeForm()
+    +storeForm(store)

@@ -3,16 +3,17 @@
 //- take in a store that defaults to empty object.
 //- if someone passes a store, we have the info. if we are not passed a store we have an empty object
 mixin storeForm(store = {})
-  form(action="/add" method = "POST" class="card")
+  form(action=`/add/${store._id || ''}` method = "POST" class="card")
     label(for="name") Name:
-    input(type="text" name="name")
+    input(type="text" name="name" value = store.name)
     label(for="description") Description:
-    textarea(name="description")
+    textarea(name="description")= store.description
     //-predef set of tags
     - const choices = ['wifi', 'open late', 'family friendly', 'vegan', 'dog friendly', 'licensed']
+    - const tags = store.tags || []
     ul.tags 
       each choice in choices
         .tag.tag__choice
-          input(type="checkbox" id=choice value=choice name="tags")
+          input(type="checkbox" id=choice value=choice name="tags" checked=(tags.includes(choice)))
           label(for=choice) #{choice}
     input(type="submit" value="Save" class="button")

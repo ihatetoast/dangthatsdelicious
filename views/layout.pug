@@ -40,11 +40,16 @@ html
       if locals.flashes
         .inner
           .flash-messages
+            //- createas an obj of the flashes. since there can be more of one type, there could be an array
             - const categories = Object.keys(locals.flashes)
+            //- so this loops over the obj
             each category in categories
+              //-and loops over the array (if more than one error or warning comes up) and then creates a dif with a class of flash--category flash--error or flash--warning
               each message in flashes[category]
                 .flash(class=`flash--${category}`)
+                  //-the != will make sure anything in html will render as html and not a string
                   p.flash__text!= message
+                  //- and this is the x at the far right to cancel
                   button.flash__remove(onClick="this.parentElement.remove()") &times;
     .content
       block content
