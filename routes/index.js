@@ -14,7 +14,15 @@ router.get('/stores/:id/edit', catchErrors(storeController.editStore))
 //myMiddleware calls next(); so it passes to the next fcn
 router.get('/add', storeController.addStore);
 //for when we post a form we need to post from add
-router.post('/add', catchErrors(storeController.createStore));
-router.post('/add/:id', catchErrors(storeController.updateStore));
+router.post('/add',
+  storeController.upload,
+  catchErrors(storeController.resize),
+  catchErrors(storeController.createStore)
+);
+router.post('/add/:id', 
+  storeController.upload,
+  catchErrors(storeController.resize),
+  catchErrors(storeController.updateStore)
+);
 
 module.exports = router;

@@ -1,6 +1,26 @@
 //for mongodb
 const mongoose = require('mongoose');
 
+//for dealing with files accepted ...
+const multer = require('multer');
+//for resizing and making file names unique
+const jimp = require('jimp');
+const uuid = require('uuid');
+
+//read photo into storage and check that it's allowed
+const multerOptions = {
+  storage: multer.memoryStorage(),
+  fileFilter(req, file, next) {
+    const isPhoto = file.mimetype.startsWith('image/');
+    if(isPhoto){
+      next(null, true);
+    } else {
+      next({ message: 'That filetype is not allowed.'}, false);
+    }
+  }
+}
+
+
 //need access to the models (store). that's already required in the start.js file, so ...
 //we just references it (b/c of the singleton: require once, reference several times)
 //store because module.exports = mongoose.model('Store', storeSchema); i defined it there at bottom of store.js
@@ -20,6 +40,28 @@ exports.addStore = (req, res)=> {
   res.render('editStore', {title: 'Add Store'})
 
 }
+//middleware for working with createstore, reads it into memory temp bec we will resize it
+exports.upload = multer(multerOptions).single('photo');
+exports.resize = async (req, res, next) =>{
+  //scheic if there is no new file to resize
+  if(!req.file){
+    next();
+    return;
+  }
+  else {
+    // console.log(req.file);
+    const extension = req.file.mimetype.split('/')[1];
+    req.body.photo = `${uuid.v4()}.${extension}`;
+    //resize
+    const photo = await jimp.read(req.file.buffer);
+    await photo.resize(800, jimp.AUTO);
+    //now to write it
+    await photo.write(`./public/uploads/${req.body.photo}`);
+    // once we hae written the photo to our filesystem, eep going
+    next(); 
+  }
+}
+
 //store created here in ES8's async await
 exports.createStore = async (req, res) => {
   const store = await (new Store(req.body)).save();
@@ -58,7 +100,7 @@ exports.editStore = async (req, res) => {
 
 exports.updateStore = async (req, res) =>{
   //set the location data to be a point
-  req.boy.location.type = "Point";
+  req.body.location.type = "Point";
   //find and update store
   //findOneAndUpdate({}) takes three args: query data and options
   const store = await Store.findOneAndUpdate({ _id: req.params.id}, req.body, 

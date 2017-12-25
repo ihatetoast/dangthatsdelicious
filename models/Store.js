@@ -38,7 +38,8 @@ const storeSchema = new mongoose.Schema({
       type: String, 
       required: 'Must supply address'
     }
-  }
+  },
+  photo: String
 });
 
 
