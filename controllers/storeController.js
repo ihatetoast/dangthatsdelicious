@@ -126,3 +126,22 @@ exports.getStoreBySlug = async (req, res, next) => {
   if (!store) return next();
   res.render('store', {store, title: store.name})
 }
+
+exports.getStoresByTag = async (req, res) => {
+  const tag = req.params.tag;
+  //either the tag chosen or everything that has a tag
+  const tagQuery = tag || { $exists: true, $ne: [] };
+
+  //get tags list
+  const tagsPromise = Store.getTagsList();
+
+  const storesPromise = Store.find({ tags: tagQuery });
+
+  // to await promises that need to be done before rendering
+  //const result = await Promise.all([tagsPromise, storesPromise])
+  //destructured (could've bee var tags = result[0] and var stores = result[1])
+  const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
+  // res.json(stores)
+
+  res.render('tag', { tags, title: 'Tags', tag, stores });
+};

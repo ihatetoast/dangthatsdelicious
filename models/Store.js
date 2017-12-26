@@ -8,7 +8,7 @@ mongoose.Promise = global.Promise;
 //makes nice urls
 const slug = require('slugs');
 
-//make scheme
+//make schema
 const storeSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -43,17 +43,44 @@ const storeSchema = new mongoose.Schema({
 });
 
 
-storeSchema.pre('save', function(next){
+//advanced functions done in the store schema pre hooks.
+
+storeSchema.pre('save', async function(next){
   //oly if store's name is modified
   if(!this.isModified('name')){
     next();//skip it
     return; // stop this function from running
   }
   this.slug = slug(this.name);
+  //dealing with name repeats by adding -next number: katy, katy-1, katy-2 ...
+  const slugRegEx = new RegExp(`^(${this.slug})((-[0-9]*$)?)$`, 'i')
+
+  //problem: have not made store, so can't use store. to find duplicates
+  //this.contructor because in the process of making the store ot after
+  const storesWithSlug = await this.constructor.find({ slug: slugRegEx })
+  //if there was a result in findingi store with thic new store's name ...
+  //add 1 to the number length. if there's katy, then katy-1. if there's katy, katy-1, then katy-2:
+  if(storesWithSlug.length){
+    this.slug = `${this.slug}-${storesWithSlug.length + 1}`
+  }
+
   next();
-  //TODO make more resiliant to avoid repeats
+  //
 })
 
+storeSchema.statics.getTagsList = function() {
+  //using this, so noooo fat arrow
+  //we are using this so we can get functions that are bound to our model
+
+  //agg takes an array of possible operators. see mongodb docs. pipeline ops. start with $.
+  return this.aggregate([
+    //first one used is$unwind. this will sort of sort by tags. if a store has two tags, it'll be listed twice, once per tag\
+    { $unwind: '$tags'},
+    { $group: { _id: '$tags', count: { $sum: 1}}},
+    { $sort: { count: -1}}
+
+  ]);
+}
 
 
 //for exporting an object (vs fcn) use module.exports
