@@ -1,3 +1,10 @@
+# Dang! That's Delicious: Learn Node with Nutty Canadian 
+The NodeJS tutorial by Wes Bos. 
+
+Full of notes (commented out)
+
+His words below. Be sure to read them with "ou" sounding like "oo". That is key.
+
 ## What is this?
 
 Just you wait folks!

@@ -1,0 +1,26 @@
+extends layout
+
+block content
+  .single
+    .single__hero
+      img(src=`/uploads/${store.photo} || 'store.png'`)
+      h2.title.title--single 
+        a(href=`/stores/${store.slug}`) #{store.name}
+
+  //- MAP and TAGS
+  .single__details.inner
+    //- what is available
+    //- pre= h.dump(store)
+    //- helpfer fcn for a static map, a fcn tha taccepts an array of coords 
+    img.single__map(src=h.staticMap(store.location.coordinates))
+    p.single__location= store.location.address
+    p= store.description
+
+    if store.tags
+      ul.tags
+        each tag in store.tags
+          li.tag
+            a.tag__link(href=`/tags/${tag}`)
+              span.tag__text #{tag}
+
+  
