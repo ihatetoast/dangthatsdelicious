@@ -1,3 +1,5 @@
+//models are what we use to store data in db
+
 //use strict for mongo
 
 //need mongoose to interface
@@ -8,7 +10,7 @@ mongoose.Promise = global.Promise;
 //makes nice urls
 const slug = require('slugs');
 
-//make schema
+//make schema.
 const storeSchema = new mongoose.Schema({
   name: {
     type: String,
