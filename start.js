@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const User = mongoose.model('user');
+const promisify = require('es6-promisify')''
 
 // Make sure we are running node 7.6+
 const [major, minor] = process.versions.node.split('.').map(parseFloat);
@@ -22,6 +24,7 @@ mongoose.connection.on('error', (err) => {
 //import all of our models
 //mongo uses a singleton. once configured, does it once 
 require('./models/Store');
+require('./models/User');
 
 // Start our app!
 const app = require('./app');

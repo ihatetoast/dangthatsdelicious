@@ -32,3 +32,7 @@ exports.validateRegister = (req, res, next)=>{
   }
   next();//there were no errors
 };
+
+exports.register = async (req, res, next) =>{
+  
+}
