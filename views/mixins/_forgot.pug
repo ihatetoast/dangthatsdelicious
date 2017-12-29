@@ -1,0 +1,11 @@
+mixin forgotForm()
+  form.form(action="/account/forgot" method="POST")
+    h2 I forgot my password.
+    label(for="email") Email
+    input(type="email" name="email")
+    input.button(type="submit" value="Send me a reset.")
+
+    //-notes on p/w reset:
+      we will check user to see if it is a user
+      then give a token to reset and also an expiry time.
+      then it's emailed to them. they click on the link and if in the exp time, they can reset.
