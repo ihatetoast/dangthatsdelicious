@@ -15,7 +15,7 @@ router.get('/stores', catchErrors(storeController.getStores));
 router.get('/stores/:id/edit', catchErrors(storeController.editStore))
 
 //myMiddleware calls next(); so it passes to the next fcn
-router.get('/add', storeController.addStore);
+router.get('/add', authController.isLoggedIn, storeController.addStore);
 //for when we post a form we need to post from add
 router.post('/add',
   storeController.upload,
@@ -43,8 +43,13 @@ router.post('/register',
   userController.validateRegister,
   userController.register,
   authController.login
-);
+)
+//need post login for when a user logs in, we know what to do with it.
 
+router.post('/login', authController.login)
 router.get('/logout', authController.logout)
+
+router.get('/account', authController.isLoggedIn, userController.account)
+router.post('/account', catchErrors(userController.updateAccount))
 
 module.exports = router;

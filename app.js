@@ -56,7 +56,7 @@ app.use(flash());
 app.use((req, res, next) => {
   res.locals.h = helpers;//helpers got required from very top
   res.locals.flashes = req.flash();
-  res.locals.user = req.user || null;
+  res.locals.user = req.user || null;//see account.pug
   res.locals.currentPath = req.path;
   next();
 });

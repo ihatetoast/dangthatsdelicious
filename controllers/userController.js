@@ -49,3 +49,25 @@ exports.register = async (req, res, next) =>{
   next();
   //move to automatically login
 }
+
+
+exports.account = (req, res) => {
+  res.render('account', { title: 'Edit your account' })
+}
+
+exports.updateAccount = async (req, res) => {
+  //take the infor the user has sent us and update account
+  const updates = {
+    name: req.body.name,
+    email: req.body.email
+  }
+  //query for spec user and update
+  const user = await User.findOneAndUpdate (
+    { _id: req.user._id },
+    { $set: updates },
+    { new: true, runValidators: true, context: 'query'}
+  )
+  // res.json(user)
+  req.flash('success', "Updated the profile.")
+  res.redirect('back')
+}

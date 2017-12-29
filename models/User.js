@@ -30,6 +30,13 @@ const userSchema = new Schema({
     trim: true
   }
 });
+
+//gravatar can be a virtual field
+userSchema.virtual('gravatar').get(function(){
+  //uses md5 it hashes the user's email address
+  const hash = md5(this.email);
+  return `https://gravatar.com/avatar/${hash}?s=200`
+})
 //passport middleware to deal with what is needed for an email/password schema. in this situation, using email
 //from passportLocalMongoose exposes us to stuff like .register takes care all lowerlevel rego for us. 
 
