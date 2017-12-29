@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const User = mongoose.model('user');
-const promisify = require('es6-promisify')''
 
 // Make sure we are running node 7.6+
 const [major, minor] = process.versions.node.split('.').map(parseFloat);

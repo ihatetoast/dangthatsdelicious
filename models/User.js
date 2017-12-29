@@ -21,16 +21,20 @@ const userSchema = new Schema({
     unique: true,
     lowercase: true,
     trim: true,
-    validate: [validator.isEmail, 'Invalid email address'],
-    required: 'Please supply an email address'
+    validate: [validator.isEmail, 'Invalid email address.'],
+    required: 'Please supply an email address.'
   },
   name: {
     type: String,
-    required: 'Please supply a name', 
+    required: 'Please supply a name.',
     trim: true
   }
 });
 //passport middleware to deal with what is needed for an email/password schema. in this situation, using email
-userSchema.plugin(passportLocalMongoose, { usernameField: 'email'});
+//from passportLocalMongoose exposes us to stuff like .register takes care all lowerlevel rego for us. 
+
+
+userSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
 userSchema.plugin(mongodbErrorHandler);
+
 module.exports = mongoose.model('User', userSchema);
