@@ -12,9 +12,9 @@ const Schema = mongoose.Schema;
 const md5 = require('md5');
 const validator = require('validator');
 const mongodbErrorHandler = require('mongoose-mongodb-errors');
-//manages sessions tokens authentication libesa
+//manages sessions tokens authentication library
 const passportLocalMongoose = require('passport-local-mongoose');
-
+//what i send to the db and how it's understood
 const userSchema = new Schema({
   email: {
     type: String,
@@ -28,7 +28,9 @@ const userSchema = new Schema({
     type: String,
     required: 'Please supply a name.',
     trim: true
-  }
+  },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date
 });
 
 //gravatar can be a virtual field

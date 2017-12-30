@@ -3,8 +3,6 @@ const router = express.Router();
 const storeController = require('../controllers/storeController');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
-
-
 //composition to catch errors:
 const { catchErrors } =require('../handlers/errorHandlers');
 // obj destructuring allows us to import an entire object. imports one method we need
@@ -51,7 +49,14 @@ router.get('/logout', authController.logout)
 
 router.get('/account', authController.isLoggedIn, userController.account)
 router.post('/account', catchErrors(userController.updateAccount))
-
 router.post('/account/forgot', catchErrors(authController.forgot))
+
+//when someone is directed to account reset and any token (:token)
+router.get('/account/reset/:token', catchErrors(authController.reset))
+
+router.post('/account/reset/:token',
+ authController.confirmedPasswords,
+ catchErrors(authController.update)
+)
 
 module.exports = router;
