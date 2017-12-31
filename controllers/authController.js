@@ -3,6 +3,7 @@ const crypto = require('crypto')
 const mongoose = require('mongoose')
 const User = mongoose.model('User')
 const promisify = require('es6-promisify')
+const mail = require('../handlers/mail')
 
 //need to send passport data and tell us if we should be logged in or not: a strategy. interfaces to check if you're allowed to be logged in. we are using local strategy
 //need to put user obj on each req. passport.js handler
@@ -48,7 +49,7 @@ exports.forgot = async (req, res) => {
   //see if user with that email exists
   const user = await User.findOne({ email: req.body.email})
     if(!user){
-      req.flash('error', "A password reset has been mailed to you.")
+      req.flash('success', "A password reset has been mailed to you.")
       res.redirect('/login')
     //this white lie is better than announcing that no user exists. 
   }
@@ -58,7 +59,14 @@ exports.forgot = async (req, res) => {
   await user.save();
   //send email with token
   const resetURL = `http://${req.headers.host}/account/reset/${user.resetPasswordToken}`
-  req.flash('success', `You have been emailed a password reset link: ${resetURL}`)
+  await mail.send({
+    user,
+    filename: 'password-reset',
+    subject: 'Password reset',
+    resetURL
+  })
+
+  req.flash('success', `You have been emailed a password reset link.`)
   //redirect to login page
   res.redirect('/login')
 }
