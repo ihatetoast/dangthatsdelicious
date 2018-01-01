@@ -26,9 +26,9 @@ const multerOptions = {
 //store because module.exports = mongoose.model('Store', storeSchema); i defined it there at bottom of store.js
 const Store = mongoose.model('Store');
 // handles when anyone requests the homepage
-exports.homePage = (req, res) => {
-  console.log(req.name);
-  res.render('index')
+  exports.homePage = (req, res) => {
+    console.log(req.name);
+    res.render('index')
 }
 //index will be in views
 
@@ -64,12 +64,16 @@ exports.resize = async (req, res, next) =>{
 
 //store created here in ES8's async await
 exports.createStore = async (req, res) => {
+  //author points to logged in user
+  req.body.author = req.user._id;
   const store = await (new Store(req.body)).save();
   //then fire off a connection to the mongodb database with .save();
   //awaiting and saving together so that we wait for that save before slug is generated
   req.flash('success', `Successfully created ${store.name}. Care to leave a review?`);
   res.redirect(`/store/${store.slug}`);
 }
+
+
 //^did not wrap in a try/catch because we are wrapping createStore in a fcn that catches errors
 exports.getStores = async (req, res) => {
   // 1. Query the database for a list of all stores
@@ -87,15 +91,23 @@ exports.getStores = async (req, res) => {
   res.render('stores', { title: 'Stores', stores });
 }
 
+const confirmOwner = (store, user) => {
+  //.equals is a mothod that comes along
+  if(!store.author.equals(user._id)){
+    throw Error('You must own a store to edit it.')
+  }
+}
+
 exports.editStore = async (req, res) => {
   // 1. find the store given the ID
     //req has params which will give me any parameters that have come thru the url
     // res.json(req.params)
-    const store = await Store.findOne({ _id: req.params.id})
+  const store = await Store.findOne({ _id: req.params.id})
     // res.json(store);
   // 2. confirm the user is the owner of the store
+  confirmOwner(store, req.user)
   // 3. render out the edit form so that the user can update their store
-    res.render('editStore', { title: `Edit ${store.name}`, store})
+  res.render('editStore', { title: `Edit ${store.name}`, store})
 }
 
 exports.updateStore = async (req, res) =>{
@@ -119,7 +131,7 @@ exports.updateStore = async (req, res) =>{
 exports.getStoreBySlug = async (req, res, next) => {
   // res.send("it works")
   // res.json(req.params);
-  const store = await Store.findOne({slug: req.params.slug})
+  const store = await Store.findOne({slug: req.params.slug}).populate('author')
   //see what we get back: 
   // res.json(store);
   //for when there's a url that isn't a store. get null. deal with it:

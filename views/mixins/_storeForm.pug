@@ -23,7 +23,7 @@ mixin storeForm(store = {})
     input(type="text" id='lat' name='location[coordinates][1]' value=(store.location && store.location.coordinates[1]) required)
 
     //-predef set of tags
-    - const choices = ['wifi', 'open late', 'family friendly', 'vegan', 'dog friendly', 'licensed']
+    - const choices = ['Wifi', 'Open Late', 'Family Friendly', 'Dog Friendly', 'Licensed']
     - const tags = store.tags || []
     ul.tags 
       each choice in choices

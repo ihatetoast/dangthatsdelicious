@@ -41,7 +41,13 @@ const storeSchema = new mongoose.Schema({
       required: 'Must supply address'
     }
   },
-  photo: String
+  photo: String,
+  //create the relationship between the store and the user. points to the user
+  author: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+    required: 'You must supply an author'
+  }
 });
 
 

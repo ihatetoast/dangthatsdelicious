@@ -3,10 +3,12 @@ mixin storeCard(store={})
   .store  
     .store__hero
       .store__actions
-        .store__action.store__action--edit
-          a(href=`/stores/${store._id}/edit`)
-            //- in helper file is a method to get svgs. remember != means there'll be html 
-            != h.icon('pencil')
+        //-if there is a user logged in AND it's the same as the store's auth
+        if user && store.author.equals(user._id)
+          .store__action.store__action--edit
+            a(href=`/stores/${store._id}/edit`)
+              //- in helper file is a method to get svgs. remember != means there'll be html 
+              != h.icon('pencil')
       img(src=`/uploads/${store.photo || 'store.png'}`)
       h2.title
         a(href=`/store/${store.slug}`) #{store.name}
