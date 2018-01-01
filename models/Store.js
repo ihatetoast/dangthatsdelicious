@@ -9,7 +9,7 @@ mongoose.Promise = global.Promise;
 
 //makes nice urls
 const slug = require('slugs');
-
+//with mongodb, indexing is sort of a preread so that in a search, mdb doesn't have to look over everything. but indices needs to be set up using the schema (look after the schema, it has to be def first)
 //make schema.
 const storeSchema = new mongoose.Schema({
   name: {
@@ -49,7 +49,12 @@ const storeSchema = new mongoose.Schema({
     required: 'You must supply an author'
   }
 });
-
+//define the indexes
+//this creates a compound index and will allow us to look up one term that could appear in both. 
+storeSchema.index({
+  name: 'text', 
+  description: 'text'
+})
 
 //advanced functions done in the store schema pre hooks.
 
