@@ -196,7 +196,7 @@ exports.mapStores = async (req, res) => {
   }
   //find stores using query and return only what is in .select() 
   //this trims the fat from the ajax return
-  const stores = await Store.find(q).select('slug name location description').limit(10);
+  const stores = await Store.find(q).select('slug name location description photo').limit(10);
   res.json(stores)
 }
 
