@@ -178,3 +178,28 @@ exports.searchStores = async (req, res) => {
   .limit(5)
   res.json(stores)
 }
+
+exports.mapStores = async (req, res) => {
+  //needsa an array of numbers that are coords. in mongo, it's lng lat. also parse them to numbers
+  const coordinates = [req.query.lng, req.query.lat].map(parseFloat)
+  //make the query $near and $geometry are part of mongodb. saweeeet
+  const q = {
+    location: {
+      $near: {
+        $geometry: {
+          type: 'Point',
+          coordinates
+        },
+        $maxDistance: 10000 //10km
+      }
+    }
+  }
+  //find stores using query and return only what is in .select() 
+  //this trims the fat from the ajax return
+  const stores = await Store.find(q).select('slug name location description').limit(10);
+  res.json(stores)
+}
+
+exports.mapPage = (req, res) =>{
+  res.render('map', {title: 'Map'})
+}

@@ -55,6 +55,7 @@ storeSchema.index({
   name: 'text', 
   description: 'text'
 })
+storeSchema.index({location: '2dsphere'})
 
 //advanced functions done in the store schema pre hooks.
 

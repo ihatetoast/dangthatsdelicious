@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 30);
+/******/ 	return __webpack_require__(__webpack_require__.s = 31);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -988,7 +988,7 @@ var _axios = __webpack_require__(12);
 
 var _axios2 = _interopRequireDefault(_axios);
 
-var _dompurify = __webpack_require__(37);
+var _dompurify = __webpack_require__(30);
 
 var _dompurify2 = _interopRequireDefault(_dompurify);
 
@@ -1880,38 +1880,6 @@ module.exports = function spread(callback) {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-__webpack_require__(11);
-
-var _bling = __webpack_require__(9);
-
-var _typeAhead = __webpack_require__(10);
-
-var _typeAhead2 = _interopRequireDefault(_typeAhead);
-
-var _autocomplete = __webpack_require__(8);
-
-var _autocomplete2 = _interopRequireDefault(_autocomplete);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-//$ below is not es6. it's above and from bling.
-//becomes pretend jquery
-(0, _autocomplete2.default)((0, _bling.$)('#address'), (0, _bling.$)('#lat'), (0, _bling.$)('#lng'));
-(0, _typeAhead2.default)((0, _bling.$)('.search'));
-
-/***/ }),
-/* 31 */,
-/* 32 */,
-/* 33 */,
-/* 34 */,
-/* 35 */,
-/* 36 */,
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
 var __WEBPACK_AMD_DEFINE_RESULT__;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -2719,6 +2687,122 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
     return DOMPurify;
 });
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(11);
+
+var _bling = __webpack_require__(9);
+
+var _map = __webpack_require__(38);
+
+var _map2 = _interopRequireDefault(_map);
+
+var _typeAhead = __webpack_require__(10);
+
+var _typeAhead2 = _interopRequireDefault(_typeAhead);
+
+var _autocomplete = __webpack_require__(8);
+
+var _autocomplete2 = _interopRequireDefault(_autocomplete);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//$ below is not es6. it's above and from bling.
+//becomes pretend jquery
+(0, _autocomplete2.default)((0, _bling.$)('#address'), (0, _bling.$)('#lat'), (0, _bling.$)('#lng'));
+(0, _typeAhead2.default)((0, _bling.$)('.search'));
+
+(0, _map2.default)((0, _bling.$)('#map'));
+
+/***/ }),
+/* 32 */,
+/* 33 */,
+/* 34 */,
+/* 35 */,
+/* 36 */,
+/* 37 */,
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _axios = __webpack_require__(12);
+
+var _axios2 = _interopRequireDefault(_axios);
+
+var _bling = __webpack_require__(9);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//in layout.pug, there's already the google maps api loaded on
+//function that takes a map and has some default lat long. see notes below
+
+var mapOptions = {
+  //atx
+  center: { lat: 30.2, lng: -97.7 },
+  zoom: 10
+};
+function loadPlaces(map) {
+  var lat = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 30.2;
+  var lng = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -97.7;
+
+  _axios2.default.get('/api/stores/near?lat=' + lat + '&lng=' + lng).then(function (res) {
+    var places = res.data;
+    if (!places.length) {
+      alert("No places found");
+      return;
+    }
+    //create bounds to center the cluster of markers
+    var bounds = new google.maps.LatLngBounds();
+    var markers = places.map(function (place) {
+      //array destructuring (es6)
+      var _place$location$coord = _slicedToArray(place.location.coordinates, 2),
+          placeLng = _place$location$coord[0],
+          placeLat = _place$location$coord[1];
+      // console.log(placeLng, placeLat);
+
+
+      var position = { lat: placeLat, lng: placeLng };
+      bounds.extend(position);
+      var marker = new google.maps.Marker({ map: map, position: position });
+
+      //attach place data to marker
+      marker.place = place;
+      return marker;
+    });
+    // zoom to fit the markers
+    map.setCenter(bounds.getCenter());
+    map.fitBounds(bounds);
+  });
+}
+function makeMap(mapDiv) {
+  if (!mapDiv) return;
+  // console.log(mapDiv);
+  //make map and store in var
+  var map = new google.maps.Map(mapDiv, mapOptions);
+  loadPlaces(map);
+  var input = (0, _bling.$)('[name="geolocate"');
+  // console.log(input);
+  var autocomplete = new google.maps.places.Autocomplete(input);
+}
+
+exports.default = makeMap;
+
+//see javascript30 for dynamically choosing geolocation
+//navigator.geolocation.getCurrentPosition ... day 21
 
 /***/ })
 /******/ ]);
