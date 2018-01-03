@@ -3,6 +3,15 @@ mixin storeCard(store={})
   .store  
     .store__hero
       .store__actions
+        //-hearting
+        if user
+          .store__action.store__action--heart
+            form.heart(method="POST" action=`/api/stores/${store._id}/heart`)
+              //- have an array of heart strings. then check if htat store's id is in the array. if so, it's red. if not, it's white
+              - const heartStrings = user.hearts.map(obj => obj.toString())
+              - const heartClass = heartStrings.includes(store._id.toString()) ? 'heart__button--hearted' : ''
+              button.heart__button(type="submit" name="heart" class=heartClass)
+                != h.icon('heart')
         //-if there is a user logged in AND it's the same as the store's auth
         if user && store.author.equals(user._id)
           .store__action.store__action--edit

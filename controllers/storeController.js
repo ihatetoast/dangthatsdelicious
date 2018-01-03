@@ -1,6 +1,10 @@
 //for mongodb
 const mongoose = require('mongoose');
-
+//need access to the models (store). that's already required in the start.js file, so ...
+//we just references it (b/c of the singleton: require once, reference several times)
+//store because module.exports = mongoose.model('Store', storeSchema); i defined it there at bottom of store.js
+const Store = mongoose.model('Store');
+const User = mongoose.model('User');
 //for dealing with files accepted ...
 const multer = require('multer');
 //for resizing and making file names unique
@@ -21,10 +25,7 @@ const multerOptions = {
 }
 
 
-//need access to the models (store). that's already required in the start.js file, so ...
-//we just references it (b/c of the singleton: require once, reference several times)
-//store because module.exports = mongoose.model('Store', storeSchema); i defined it there at bottom of store.js
-const Store = mongoose.model('Store');
+
 // handles when anyone requests the homepage
   exports.homePage = (req, res) => {
     console.log(req.name);
@@ -202,4 +203,19 @@ exports.mapStores = async (req, res) => {
 
 exports.mapPage = (req, res) =>{
   res.render('map', {title: 'Map'})
+}
+
+exports.heartStore = async (req, res) => {
+  //toggle: if they have a heart on a store, then clickng heart will undo (unlike). if they do not, then adds a heart
+  //get an array of hearts. we pass in an obj and do mongodb magic with mdb's toString
+  const hearts = req.user.hearts.map(obj => obj.toString())
+  //make an operator that either take out of or put into (so if the store's id is in or not)
+  //addToSet keeps it unique
+  const operator = hearts.includes(req.params.id) ? '$pull' : '$addToSet'
+  const user = await User
+  .findByIdAndUpdate(req.user._id,
+    { [operator]: { hearts: req.params.id} },
+    { new: true }
+  )
+  res.json(user)
 }
