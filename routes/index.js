@@ -3,10 +3,10 @@ const router = express.Router();
 const storeController = require('../controllers/storeController');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
+const reviewController = require('../controllers/reviewController');
 //composition to catch errors:
 const { catchErrors } =require('../handlers/errorHandlers');
-// obj destructuring allows us to import an entire object. imports one method we need
-
+// obj destructuring allows us to import an entire object. imports one method we need 
 // Do work here
 router.get('/', catchErrors(storeController.getStores));
 router.get('/stores', catchErrors(storeController.getStores));
@@ -62,6 +62,8 @@ router.post('/account/reset/:token',
 router.get('/hearts', authController.isLoggedIn, catchErrors(storeController.getHearts))
 
 router.get('/map', storeController.mapPage)
+
+router.post('/reviews/:id', authController.isLoggedIn, catchErrors(reviewController.addReview))
 /*
 API
 */ 

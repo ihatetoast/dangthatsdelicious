@@ -23,6 +23,7 @@ mongoose.connection.on('error', (err) => {
 //mongo uses a singleton. once configured, does it once 
 require('./models/Store');
 require('./models/User');
+require('./models/Review');
 
 // Start our app!
 const app = require('./app');
