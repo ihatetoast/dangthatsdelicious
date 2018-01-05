@@ -100,6 +100,28 @@ storeSchema.statics.getTagsList = function() {
 
   ]);
 }
+
+storeSchema.statics.getTopStores = function(){
+  return this.aggregate([
+//lookup stores and populate reviews (mondodb took "Review" and made it'reviews)
+{ $lookup: {from: 'reviews', localField: '_id', foreignField: 'store', as: 'reviews'} },
+//filter for only items that have 2 or more reviews
+//sees if there is a 2nd rewview (index 1) and if so, it's matched / shown only those
+{ $match: { 'reviews.1': { $exists: true} }},
+//add the average reviews field
+{ $project: {
+  photo: '$$ROOT.photo',
+  name:'$$ROOT.name',
+  reviews: '$$ROOT.reviews',
+  slug: '$$ROOT.slug',
+  averageRating: { $avg: '$reviews.rating'}
+}},
+//sort by our new field h to l
+{ $sort: { averageRating: -1} },
+{ $limit: 10}
+//limit to 10
+  ])
+}
 //find reviews where the store's _id property === review's store property
 //note: virtual won't go to a json obj unless explicitly told to do so ( we are doing it for dot dump)
 storeSchema.virtual('reviews', {
@@ -108,6 +130,11 @@ storeSchema.virtual('reviews', {
   localField: '_id', //which field on the store
   foreignField: 'store'// which field on the review
 })
-
+function autopopulate(next){
+  this.populate('reviews')
+  next();
+}
+storeSchema.pre('find', autopopulate)
+storeSchema.pre('findOne', autopopulate)
 //for exporting an object (vs fcn) use module.exports
 module.exports = mongoose.model('Store', storeSchema);

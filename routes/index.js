@@ -8,8 +8,12 @@ const reviewController = require('../controllers/reviewController');
 const { catchErrors } =require('../handlers/errorHandlers');
 // obj destructuring allows us to import an entire object. imports one method we need 
 // Do work here
+
 router.get('/', catchErrors(storeController.getStores));
 router.get('/stores', catchErrors(storeController.getStores));
+router.get('/stores/page/:page', catchErrors(storeController.getStores));
+
+
 router.get('/stores/:id/edit', catchErrors(storeController.editStore))
 
 //myMiddleware calls next(); so it passes to the next fcn
@@ -64,6 +68,11 @@ router.get('/hearts', authController.isLoggedIn, catchErrors(storeController.get
 router.get('/map', storeController.mapPage)
 
 router.post('/reviews/:id', authController.isLoggedIn, catchErrors(reviewController.addReview))
+
+router.get('/top', catchErrors(storeController.getTopStores))
+
+
+
 /*
 API
 */ 

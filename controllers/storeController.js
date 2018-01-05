@@ -77,23 +77,33 @@ exports.createStore = async (req, res) => {
 
 //^did not wrap in a try/catch because we are wrapping createStore in a fcn that catches errors
 exports.getStores = async (req, res) => {
+  const page = req.params.page || 1;
+  const limit = 4;
+  const skip = (page * limit) - limit;
+
   // 1. Query the database for a list of all stores
-  const stores = await Store.find();
-  res.render('stores', { title: 'Stores', stores });
+  const storesPromise = Store
+    .find()
+    .skip(skip)
+    .limit(limit)
+    .sort({ created: 'desc' });
+
+  const countPromise = Store.count();
+
+  const [stores, count] = await Promise.all([storesPromise, countPromise]);
+  const pages = Math.ceil(count / limit);
+  if (!stores.length && skip) {
+    req.flash('info', `Oops! Page ${page} doesn't exist. You're redirected to ${pages}`);
+    res.redirect(`/stores/page/${pages}`);
+    return;
+  }
+
+  res.render('stores', { title: 'Stores', stores, page, pages, count });
 };
 
-//display the stores on the page (home) and when i visit store's page. so need a controller to run on both of those routes (home and the indiv store's page)
-exports.getStores = async (req, res) => {
-  //query db for a list of all stores
-  //.find() will query db for all of them. deal with pagination later
-  //save in a database by setting a var. store.find creates a promise, so need to await it
-  const stores = await Store.find();
-  // console.log(stores);
-  res.render('stores', { title: 'Stores', stores });
-}
 
 const confirmOwner = (store, user) => {
-  //.equals is a mothod that comes along
+  //.equals is a method that comes along
   if(!store.author.equals(user._id)){
     throw Error('You must own a store to edit it.')
   }
@@ -227,4 +237,10 @@ exports.getHearts = async (req, res) => {
     _id: { $in: req.user.hearts}
   })
   res.render('stores', { title: 'Hearted Stores', stores})
+}
+
+exports.getTopStores = async (req, res) => {
+  const stores = await Store.getTopStores();
+  // res.json(stores)
+  res.render('topStores', { stores, title:'⭐ Top Stores!'});
 }
