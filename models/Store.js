@@ -48,7 +48,12 @@ const storeSchema = new mongoose.Schema({
     ref: 'User',
     required: 'You must supply an author'
   }
-});
+},
+{
+  toJSON: {virtuals: true},
+  toObject: {virtuals: true}//so we can use pre dump
+}
+);
 //define the indexes
 //this creates a compound index and will allow us to look up one term that could appear in both. 
 storeSchema.index({
@@ -95,7 +100,14 @@ storeSchema.statics.getTagsList = function() {
 
   ]);
 }
-
+//find reviews where the store's _id property === review's store property
+//note: virtual won't go to a json obj unless explicitly told to do so ( we are doing it for dot dump)
+storeSchema.virtual('reviews', {
+  //go to another model and do a quick query
+  ref: 'Review',//and what model to link
+  localField: '_id', //which field on the store
+  foreignField: 'store'// which field on the review
+})
 
 //for exporting an object (vs fcn) use module.exports
 module.exports = mongoose.model('Store', storeSchema);

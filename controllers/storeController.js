@@ -132,7 +132,9 @@ exports.updateStore = async (req, res) =>{
 exports.getStoreBySlug = async (req, res, next) => {
   // res.send("it works")
   // res.json(req.params);
-  const store = await Store.findOne({slug: req.params.slug}).populate('author')
+  const store = await Store
+  .findOne({slug: req.params.slug})
+  .populate('author reviews')
   //see what we get back: 
   // res.json(store);
   //for when there's a url that isn't a store. get null. deal with it:
